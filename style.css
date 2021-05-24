@@ -1,0 +1,151 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+html {
+  height: 100%;
+}
+body {
+  background-size: cover;
+  height: 100%;
+  background: linear-gradient(to top, rgba(247, 41, 202, 0.356), rgb(163, 79, 241));
+  background-repeat: no-repeat;
+}
+
+section {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  padding-top: 10vh;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+  font-size: 5rem;
+  font-family: Roboto, sans-serif;
+  padding-bottom: 5vh;
+  color:rgb(117, 197, 37)
+}
+
+.task-make-container {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2vh .5vw;
+  border: 2px solid  rgba(133, 23, 235, 0.986);
+  border-radius: 5px;
+  margin-bottom: 3vh;
+}
+
+#task-make-input {
+  width: 70%;
+  height: 10vh;
+  background-color: rgba(147, 53, 235, 0.329);
+  border: none;
+  border-radius: 5px;
+  font-size: 2rem;
+}
+
+#task-make-input:focus {
+  border: none;
+}
+
+#add-button {
+  width: 13%;
+  height: 10vh;
+  background-color: rgba(142, 224, 17, 0.89);
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 3px;
+
+}
+
+#delete-all {
+  width: 13%;
+  height: 10vh;
+  font-size: 1.3rem;
+  background-color: rgba(201, 50, 30, 0.918);
+  border-radius: 3px;
+  border: none;
+}
+
+hr {
+  width: 100%;
+  border: 1px solid rgb(133, 24, 235);
+  border-radius: 5px;
+}
+
+.list-container {
+  height: 60%;
+  width: 100%;
+  overflow: hidden;
+}
+
+ul {
+  display: flex;
+    height: 99%;
+    width: 98%;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+ul::-webkit-scrollbar {
+  width: 5px;
+  height: 8px;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 95%;
+  margin-top: 3vh;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: .5vh 1vw;
+}
+
+
+li input[type='checkbox'] {
+  height: 3vh;
+  width: 3vh;
+}
+
+li input[type='text'] {
+  border: none;
+  border-radius: 3px;
+  width: 80%;
+  height: 5vh;
+  background-color: rgba(147, 53, 235, 0.329);
+  font-size: 1.3rem;
+}
+
+.done {
+  opacity: 0.5;
+}
+
+.edit-task {
+  width: 4%;
+}
+
+.edit-task:hover {
+  opacity: .5;
+}
+
+.delete-task {
+  width: 4%;
+}
+
+.delete-task:hover {
+  opacity: .5;
+}
