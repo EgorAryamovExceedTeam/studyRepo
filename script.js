@@ -41,9 +41,8 @@ const isEmpty = (string) => {
 const addNewTask = () => {
 	if(isEmpty(currentInputValue)) {
 		taskListArray.push({
-			taskText : isEmpty(currentInputValue),
-			isChecked : false,
-			dateTime : new Date()
+			text : isEmpty(currentInputValue),
+			isCheck : false,
 		});
 		localStorage.setItem('tasks', JSON.stringify(taskListArray));
 		taskInput.value = '';
@@ -55,16 +54,16 @@ const addNewTask = () => {
 
 // click on li's checkbox
 const clickOnCheckbox = (index) => {
-	taskListArray[index].isChecked = !taskListArray[index].isChecked;
-	if (taskListArray[index].isChecked) {
+	taskListArray[index].isCheck = !taskListArray[index].isCheck;
+	if (taskListArray[index].isCheck) {
 			const elem = taskListArray.splice(index, 1);
 			taskListArray.push(...elem);
 			localStorage.setItem('tasks', JSON.stringify(taskListArray));
 			renderList();
 	} else {
-			let notDone = taskListArray.filter(item => item.isChecked === false);
+			let notDone = taskListArray.filter(item => item.isCheck === false);
 			console.log(notDone);
-			let done = taskListArray.filter(item => item.isChecked === true);
+			let done = taskListArray.filter(item => item.isCheck === true);
 			quickSortRecursive(notDone, 0, notDone.length - 1);
 			taskListArray = [...notDone, ...done];
 			
@@ -114,7 +113,7 @@ const elemsOfListItem = (index) => {
 // click on the pencil
 const editThisTask = (index) => {
 	const {elem, editTask, task} = elemsOfListItem(index);
-	if (!elem.isChecked){
+	if (!elem.isCheck){
 		editTask.src = 'tick.svg';
 		editTask.nextSibling.src = 'arrows-circle.svg'
 
@@ -142,7 +141,7 @@ const saveChangesInInput = (index) => {
 		}
 		return;
 	}
-		elem.taskText = isEmpty(task.value);
+		elem.text = isEmpty(task.value);
 		task.disabled = true;
 
 		editTask.src = 'edit.svg';
@@ -157,7 +156,7 @@ const saveChangesInInput = (index) => {
 const previousInputValue = (index) => {
 	const {elem, editTask, task} = elemsOfListItem(index);
 
-	task.value = elem.taskText;
+	task.value = elem.text;
 	task.disabled = true;
 
 	editTask.src = 'edit.svg';
@@ -185,13 +184,13 @@ const renderList = () => {
 
 		const itemCheckbox = document.createElement('input');
 		itemCheckbox.type = 'checkbox';
-		itemCheckbox.checked = item.isChecked;
+		itemCheckbox.checked = item.isCheck;
 		itemCheckbox.onclick = () => clickOnCheckbox(index);
 		
 		const itemInput = document.createElement('input');
 		itemInput.type = 'text';
 		itemInput.id =`text-${index}`;
-		itemInput.value = item.taskText;
+		itemInput.value = item.text;
 		itemInput.disabled = true;
 
 		const editTask = document.createElement('img');
