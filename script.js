@@ -1,4 +1,5 @@
-let taskListArray = JSON.parse(localStorage.getItem('tasks')) || [];
+
+let taskListArray = [];
 
 
 
@@ -8,10 +9,17 @@ const taskInput = document.getElementById('task-make-input');
 const addButton = document.getElementById('add-button');
 
 
-window.onload = function init() {
-  
+window.onload = async () => {
+	// get request for load page
+const response = await fetch('http://localhost:8000/allTasks', {
+	method: 'GET'
+});
+
+const jsonResult = await response.json();
+taskListArray = jsonResult.data || [];
 renderList();
 }
+
 addButton.addEventListener(`click`, () => addNewTask());
 
 // delete all tasks 
@@ -38,14 +46,21 @@ const isEmpty = (string) => {
 }
 
 // add new task
-const addNewTask = () => {
+const addNewTask = async () => {
 	if(isEmpty(currentInputValue)) {
-		taskListArray.push({
-			taskText : isEmpty(currentInputValue),
-			isChecked : false,
-			dateTime : new Date()
+		const response = await fetch ('http://localhost:8000/createTask', {
+			method: 'POST',
+			headers: {
+				'Content-Type' : 'application/json;charset=utf-8',
+				'Access-Control-Allow-Origin': '*'
+			},
+			body : JSON.stringify({
+				text : isEmpty(currentInputValue),
+				isCheck: false
+			})
 		});
-		localStorage.setItem('tasks', JSON.stringify(taskListArray));
+		let jsonResult = await response.json();
+		taskListArray = jsonResult.data;
 		taskInput.value = '';
 		currentInputValue = taskInput;
 		taskInput.focus();
@@ -54,50 +69,23 @@ const addNewTask = () => {
 }
 
 // click on li's checkbox
-const clickOnCheckbox = (index) => {
-	taskListArray[index].isChecked = !taskListArray[index].isChecked;
-	if (taskListArray[index].isChecked) {
-			const elem = taskListArray.splice(index, 1);
-			taskListArray.push(...elem);
-			localStorage.setItem('tasks', JSON.stringify(taskListArray));
-			renderList();
-	} else {
-			let notDone = taskListArray.filter(item => item.isChecked === false);
-			console.log(notDone);
-			let done = taskListArray.filter(item => item.isChecked === true);
-			quickSortRecursive(notDone, 0, notDone.length - 1);
-			taskListArray = [...notDone, ...done];
-			
-			console.log(done);
-			console.log(taskListArray);
-			localStorage.setItem('tasks', JSON.stringify(taskListArray));
-			renderList();
-	}
-}
-
-// first part of quick sort
-const partition = (array, start, end) => {
-	const pivotValue = array[end];
-	let pivotIndex = start; 
-	for (let i = start; i < end; i++) {
-			if (array[i].dateTime < pivotValue.dateTime) {
-			[array[i], array[pivotIndex]] = [array[pivotIndex], array[i]];
-			pivotIndex++;
-			}
-	}
-	[array[pivotIndex], array[end]] = [array[end], array[pivotIndex]] 
-	return pivotIndex;
-};
-
-// quick sort recursive func
-const quickSortRecursive = (arr, start, end) => {
-	if (start >= end) {
-			return;
-	}
-	let index = partition(arr, start, end);
-
-	quickSortRecursive(arr, start, index - 1);
-	quickSortRecursive(arr, index + 1, end);
+const clickOnCheckbox = async (index) => {
+	const response = await fetch (`http://localhost:8000/updateTask?id=${taskListArray[index].id}`,{
+		method: 'PATCH',
+		headers: {
+			'Content-Type' : 'application/json;charset=utf-8',
+			'Access-Control-Allow-Origin' : '*'
+		},
+		body : JSON.stringify({
+			text : [...taskListArray][index].text,
+			isCheck : !taskListArray[index].isCheck,
+			id: taskListArray[index].id
+		})
+	})
+	let result = await response.json();
+	taskListArray = result.data;
+	taskListArray.sort((a, b) => a.isCheck - b.isCheck);
+	renderList();
 }
 
 // these three values are used multiple times,
@@ -107,21 +95,21 @@ const elemsOfListItem = (index) => {
 	return {
 		 elem : taskListArray.find((item, idx) => idx === index),
 		 editTask : document.getElementById(`${index}`).querySelector('.edit-task'),
-		 task : document.getElementById(`text-${index}`)
+		 input : document.getElementById(`text-${index}`)
 		}
 	}
 
 // click on the pencil
 const editThisTask = (index) => {
-	const {elem, editTask, task} = elemsOfListItem(index);
-	if (!elem.isChecked){
+	const {elem, editTask, input} = elemsOfListItem(index);
+	if (!elem.isCheck){
 		editTask.src = 'tick.svg';
 		editTask.nextSibling.src = 'arrows-circle.svg'
 
-		task.disabled = false;
-		task.focus();
+		input.disabled = false;
+		input.focus();
 
-		task.addEventListener('keydown', (event) => {
+		input.addEventListener('keydown', (event) => {
 			if(event.key === 'Enter') saveChangesInInput(index);
 		})
 		editTask.onclick = () => saveChangesInInput(index);
@@ -130,49 +118,69 @@ const editThisTask = (index) => {
 }
 
 // save changes on edited input
-const saveChangesInInput = (index) => {
-	const {elem, editTask, task} = elemsOfListItem(index);
+const saveChangesInInput = async (index) => {
+	const {elem, editTask, input} = elemsOfListItem(index);
 
-	if (!isEmpty(task.value)) {
+	if (!isEmpty(input.value)) {
 		if (confirm('There is no value in the input field. Are you sure?')) {
-			taskListArray.splice(index, 1);
+			const response = await fetch(`http://localhost:8000/deleteTask?id=${taskListArray[index].id}`, {
+				method : 'DELETE',
+				headers : {
+					'Access-Control-Allow-Origin' : '*'
+				}
+			})
+			let result = await response.json();
+			taskListArray = result.data;
 			renderList();
 		} else {
-			task.focus();
+			input.focus();
 		}
 		return;
 	}
-		elem.taskText = isEmpty(task.value);
-		task.disabled = true;
 
-		editTask.src = 'edit.svg';
-		editTask.nextSibling.src = 'close.svg';
-		taskInput.focus();
-		localStorage.setItem('tasks', JSON.stringify(taskListArray));
-		renderList()
+	const response = await fetch(`http://localhost:8000/updateTask?id=${taskListArray[index].id}`, {
+		method : 'PATCH',
+		headers : {
+			'Content-Type' : 'application/json;charset=utf-8',
+			'Access-Control-Allow-Origin' : '*'
+		},
+		body : JSON.stringify({
+			text: isEmpty(input.value),
+			isCheck: elem.isCheck,
+			id: taskListArray[index].id
+		})
+	})
+	let result = await response.json();
+	elem.text = result.data[index].text;
+	input.disabled = true;
+
+	editTask.src = 'edit.svg';
+	editTask.nextSibling.src = 'close.svg';
+	taskInput.focus();
+	renderList()
 	
 }
 
 // return the previous value
 const previousInputValue = (index) => {
-	const {elem, editTask, task} = elemsOfListItem(index);
+	const {elem, editTask, input} = elemsOfListItem(index);
 
-	task.value = elem.taskText;
-	task.disabled = true;
+	input.value = elem.text;
+	input.disabled = true;
 
 	editTask.src = 'edit.svg';
 	editTask.nextSibling.src = 'close.svg';
 	taskInput.focus();
-	localStorage.setItem('tasks', JSON.stringify(taskListArray));
 	renderList()
 }
 
-
-
 // delete list element
-const deleteThisTask = (index) => {
-	taskListArray.splice(index, 1);
-	localStorage.setItem('tasks', JSON.stringify(taskListArray));
+const deleteThisTask = async (index) => {
+	const response = await fetch(`http://localhost:8000/deleteTask?id=${taskListArray[index].id}`, {
+		method : 'DELETE'
+	})
+	let result = await response.json();
+	taskListArray = result.data;
 	renderList();
 }
 
@@ -185,13 +193,13 @@ const renderList = () => {
 
 		const itemCheckbox = document.createElement('input');
 		itemCheckbox.type = 'checkbox';
-		itemCheckbox.checked = item.isChecked;
+		itemCheckbox.checked = item.isCheck;
 		itemCheckbox.onclick = () => clickOnCheckbox(index);
 		
 		const itemInput = document.createElement('input');
 		itemInput.type = 'text';
 		itemInput.id =`text-${index}`;
-		itemInput.value = item.taskText;
+		itemInput.value = item.text;
 		itemInput.disabled = true;
 
 		const editTask = document.createElement('img');
@@ -212,11 +220,3 @@ const renderList = () => {
 		list.append(listItem);
 	});
 }
-
-
-
-
-
-
-
-
