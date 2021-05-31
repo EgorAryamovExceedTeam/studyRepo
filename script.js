@@ -10,15 +10,16 @@ const addButton = document.getElementById('add-button');
 
 
 window.onload = async () => {
-
 	// get request for load page
 const response = await fetch('http://localhost:8000/allTasks', {
 	method: 'GET'
 });
+
 const jsonResult = await response.json();
 taskListArray = jsonResult.data || [];
 renderList();
 }
+
 addButton.addEventListener(`click`, () => addNewTask());
 
 // delete all tasks 
@@ -46,7 +47,6 @@ const isEmpty = (string) => {
 
 // add new task
 const addNewTask = async () => {
-	console.log(taskListArray);
 	if(isEmpty(currentInputValue)) {
 		const response = await fetch ('http://localhost:8000/createTask', {
 			method: 'POST',
@@ -60,7 +60,6 @@ const addNewTask = async () => {
 			})
 		});
 		let jsonResult = await response.json();
-		console.log(jsonResult.data);
 		taskListArray = jsonResult.data;
 		taskInput.value = '';
 		currentInputValue = taskInput;
@@ -78,7 +77,7 @@ const clickOnCheckbox = async (index) => {
 			'Access-Control-Allow-Origin' : '*'
 		},
 		body : JSON.stringify({
-			text : taskListArray[index].text,
+			text : [...taskListArray][index].text,
 			isCheck : !taskListArray[index].isCheck,
 			id: taskListArray[index].id
 		})
@@ -96,21 +95,21 @@ const elemsOfListItem = (index) => {
 	return {
 		 elem : taskListArray.find((item, idx) => idx === index),
 		 editTask : document.getElementById(`${index}`).querySelector('.edit-task'),
-		 task : document.getElementById(`text-${index}`)
+		 input : document.getElementById(`text-${index}`)
 		}
 	}
 
 // click on the pencil
 const editThisTask = (index) => {
-	const {elem, editTask, task} = elemsOfListItem(index);
+	const {elem, editTask, input} = elemsOfListItem(index);
 	if (!elem.isCheck){
 		editTask.src = 'tick.svg';
 		editTask.nextSibling.src = 'arrows-circle.svg'
 
-		task.disabled = false;
-		task.focus();
+		input.disabled = false;
+		input.focus();
 
-		task.addEventListener('keydown', (event) => {
+		input.addEventListener('keydown', (event) => {
 			if(event.key === 'Enter') saveChangesInInput(index);
 		})
 		editTask.onclick = () => saveChangesInInput(index);
@@ -120,9 +119,9 @@ const editThisTask = (index) => {
 
 // save changes on edited input
 const saveChangesInInput = async (index) => {
-	const {elem, editTask, task} = elemsOfListItem(index);
+	const {elem, editTask, input} = elemsOfListItem(index);
 
-	if (!isEmpty(task.value)) {
+	if (!isEmpty(input.value)) {
 		if (confirm('There is no value in the input field. Are you sure?')) {
 			const response = await fetch(`http://localhost:8000/deleteTask?id=${taskListArray[index].id}`, {
 				method : 'DELETE',
@@ -134,10 +133,11 @@ const saveChangesInInput = async (index) => {
 			taskListArray = result.data;
 			renderList();
 		} else {
-			task.focus();
+			input.focus();
 		}
 		return;
 	}
+
 	const response = await fetch(`http://localhost:8000/updateTask?id=${taskListArray[index].id}`, {
 		method : 'PATCH',
 		headers : {
@@ -145,35 +145,32 @@ const saveChangesInInput = async (index) => {
 			'Access-Control-Allow-Origin' : '*'
 		},
 		body : JSON.stringify({
-			text: isEmpty(task.value),
+			text: isEmpty(input.value),
 			isCheck: elem.isCheck,
 			id: taskListArray[index].id
 		})
 	})
 	let result = await response.json();
-	console.log(result)
 	elem.text = result.data[index].text;
-	task.disabled = true;
+	input.disabled = true;
 
 	editTask.src = 'edit.svg';
 	editTask.nextSibling.src = 'close.svg';
 	taskInput.focus();
-	localStorage.setItem('tasks', JSON.stringify(taskListArray));
 	renderList()
 	
 }
 
 // return the previous value
 const previousInputValue = (index) => {
-	const {elem, editTask, task} = elemsOfListItem(index);
+	const {elem, editTask, input} = elemsOfListItem(index);
 
-	task.value = elem.text;
-	task.disabled = true;
+	input.value = elem.text;
+	input.disabled = true;
 
 	editTask.src = 'edit.svg';
 	editTask.nextSibling.src = 'close.svg';
 	taskInput.focus();
-	localStorage.setItem('tasks', JSON.stringify(taskListArray));
 	renderList()
 }
 
