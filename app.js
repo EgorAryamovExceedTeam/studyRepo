@@ -10,11 +10,8 @@ app.use(express.json());
 
 app.use('/', apiRoutes);
 
-
 const url = 'mongodb+srv://EgorRestAPI:Nokiaversia228@cluster0.qnjrd.mongodb.net/UsersDB?retryWrites=true&w=majority';
 mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true});
-
-
 
 app.listen(8000, () => {
   console.log('Server has been started on port 8000...')
