@@ -158,7 +158,7 @@ const saveChangesInInput = async (index) => {
 			text: isEmpty(input.value),
 			isCheck: elem.isCheck,
 			_id: _id,
-			__: __v
+			__v: __v
 		})
 	})
 	let result = await response.json();

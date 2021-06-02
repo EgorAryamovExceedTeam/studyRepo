@@ -29,7 +29,7 @@ module.exports.deleteTask = (req, res, next) => {
 
 // change task (task's text, isCheck)
 module.exports.changeTaskInfo = (req, res, next) => {
-  Task.updateOne({_id: req.query._id}, req.body).then(() => {
+  Task.updateOne({_id: req.body._id}, req.body).then(() => {
     Task.find().then(result => {
       res.send({data: result});
     })
