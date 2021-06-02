@@ -1,16 +1,14 @@
 
 let taskListArray = [];
 
-
-
 const deleteAll = document.getElementById('delete-all');
 let currentInputValue = '';
 const taskInput = document.getElementById('task-make-input');
 const addButton = document.getElementById('add-button');
 
-
 window.onload = async () => {
-	// get request for load page
+
+// get request for load page
 const response = await fetch('http://localhost:8000/allTasks', {
 	method: 'GET'
 });
@@ -39,7 +37,6 @@ deleteAll.onclick = async () => {
 taskInput.addEventListener('keyup', () => {
 	currentInputValue = taskInput.value;
 });
-
 
 // add to press Enter
 taskInput.addEventListener('keydown', (event) => {
@@ -158,7 +155,7 @@ const saveChangesInInput = async (index) => {
 			text: isEmpty(input.value),
 			isCheck: elem.isCheck,
 			_id: _id,
-			__: __v
+			__v: __v
 		})
 	})
 	let result = await response.json();
