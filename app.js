@@ -2,12 +2,14 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const dotenv = require("dotenv");
 const app = express();
+dotenv.config();
 
 const apiRoutes = require("./src/modules/routes/routes");
 
-const url = `mongodb+srv://EgorRestAPI:Nokiaversia228@cluster0.qnjrd.mongodb.net/UsersDB?retryWrites=true&w=majority`;
-mongoose.connect(url, {
+const uri = process.env.URI;
+mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
