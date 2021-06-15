@@ -73,7 +73,7 @@ const addNewTask = async () => {
 
 // click on li's checkbox
 const clickOnCheckbox = async (index) => {
-  const { _id, text, isCheck, __v } = taskListArray[index];
+  const { _id, text, isCheck } = taskListArray[index];
   const response = await fetch(
     `http://localhost:8000/updateTask?_id=${taskListArray[index]._id}`,
     {
@@ -86,7 +86,6 @@ const clickOnCheckbox = async (index) => {
         text: text,
         isCheck: !isCheck,
         _id: _id,
-        __v: __v,
       }),
     }
   );
@@ -127,7 +126,7 @@ const editThisTask = (index) => {
 // save changes on edited input
 const saveChangesInInput = async (index) => {
   const { elem, editTask, input } = elemsOfListItem(index);
-  const { _id, text, isCheck, __v } = taskListArray[index];
+  const { _id, text, isCheck } = taskListArray[index];
   if (!isEmpty(input.value)) {
     if (confirm("There is no value in the input field. Are you sure?")) {
       const response = await fetch(
@@ -157,8 +156,7 @@ const saveChangesInInput = async (index) => {
     body: JSON.stringify({
       text: isEmpty(input.value),
       isCheck: elem.isCheck,
-      _id: _id,
-      __v: __v,
+      _id: _id
     }),
   });
   let result = await response.json();
@@ -186,8 +184,9 @@ const previousInputValue = (index) => {
 
 // delete list element
 const deleteThisTask = async (index) => {
+  const { _id, text, isCheck } = taskListArray[index];
   const response = await fetch(
-    `http://localhost:8000/deleteTask?_id=${taskListArray[index]._id}`,
+    `http://localhost:8000/deleteTask?_id=${_id}`,
     {
       method: "DELETE",
     }
