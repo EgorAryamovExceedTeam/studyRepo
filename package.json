@@ -1,0 +1,25 @@
+{
+  "name": "to-do-list",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.12.12"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EgorAryamovExceedTeam/studyRepo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EgorAryamovExceedTeam/studyRepo/issues"
+  },
+  "homepage": "https://github.com/EgorAryamovExceedTeam/studyRepo#readme",
+  "description": ""
+}
